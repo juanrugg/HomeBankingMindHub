@@ -1,7 +1,14 @@
 using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers().AddJsonOptions(x=>
+x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
