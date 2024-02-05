@@ -3,7 +3,11 @@ using HomeBankingMindHub.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
 
 builder.Services.AddControllers().AddJsonOptions(x=>
 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
@@ -17,6 +21,10 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<HomeBankingContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HomeBankingConexion")));
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+
 
 var app = builder.Build();
 
@@ -38,7 +46,9 @@ using(var scope = app.Services.CreateScope())
         logger.LogError(ex, "Ha ocurrido un error al enviar la información a la base de datos!");
     }
 }
+
 // Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
