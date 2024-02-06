@@ -14,12 +14,12 @@ namespace HomeBankingMindHub.Repositories
         }
         public void Create(T entity)
         {
-            throw new NotImplementedException();
+            this.RepositoryContext.Set<T>().Add(entity);
         }
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            this.RepositoryContext.Set<T>().Remove(entity);
         }
 
         public IQueryable<T> FindAll()
@@ -46,12 +46,12 @@ namespace HomeBankingMindHub.Repositories
 
         public void SaveChanges()
         {
-            throw new NotImplementedException();
+            this.RepositoryContext.SaveChanges();
         }
 
         public void Update(T entity)
         {
-            throw new NotImplementedException();
+            this.RepositoryContext.Set<T>().Update(entity);
         }
     }
 }
