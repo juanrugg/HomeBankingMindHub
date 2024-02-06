@@ -64,6 +64,13 @@ namespace HomeBankingMindHub.Controllers
                             Balance = ac.Balance,
                             CreationDate = ac.CreationDate,
                             Number = ac.Number
+                        }).ToList(),
+                        Loans = client.ClientLoans.Select(cl => new ClientLoanDto { 
+                            Id = cl.Id,
+                            LoanId = cl.LoanId,
+                            Name = cl.Loan.Name,
+                            Amount = cl.Amount,
+                            Payments = int.Parse(cl.Payments)
                         }).ToList()
                     };
 
@@ -82,19 +89,14 @@ namespace HomeBankingMindHub.Controllers
         [HttpGet("{id}")]
 
         public IActionResult Get(long id)
-
         {
-
             try
-
             {
-
                 var client = _clientRepository.FindById(id);
                 if (client == null)
                 {
                     return Forbid();
                 }
-
 
                 var clientDTO = new ClientDto
                 {
@@ -108,6 +110,14 @@ namespace HomeBankingMindHub.Controllers
                         Balance = ac.Balance,
                         CreationDate = ac.CreationDate,
                         Number = ac.Number
+                    }).ToList(),
+                    Loans = client.ClientLoans.Select(cl => new ClientLoanDto
+                    {
+                        Id = cl.Id,
+                        LoanId = cl.LoanId,
+                        Name = cl.Loan.Name,
+                        Amount = cl.Amount,
+                        Payments = int.Parse(cl.Payments)
                     }).ToList()
                 };
                 return Ok(clientDTO);
