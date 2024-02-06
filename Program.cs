@@ -14,6 +14,7 @@ builder.Services.AddControllers().AddJsonOptions(x=>
 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -61,6 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseRouting();

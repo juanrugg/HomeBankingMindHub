@@ -57,7 +57,7 @@
 
                         new Transaction { AccountId= account1.Id, Amount = -3000, Date= DateTime.Now.AddHours(-7), Description = "Compra en CompraGamer", Type = TransactionType.DEBIT.ToString() },
 
-                        new Transaction { AccountId= account1.Id, Amount = 20000, Date= DateTime.Now.AddHours(-8), Description = "Premio Telekino", Type = TransactionType.DEBIT.ToString() }
+                        new Transaction { AccountId= account1.Id, Amount = 20000, Date= DateTime.Now.AddHours(-8), Description = "Premio Telekino", Type = TransactionType.CREDIT.ToString() }
 
                     };
 
