@@ -10,6 +10,7 @@ namespace HomeBankingMindHub.Dto
         public string LastName { get; set; }
         public string Email { get; set; }
         public ICollection<AccountDto> Accounts { get; set; }
-        public ICollection<ClientLoanDto> Loans { get; set; }
+        public ICollection<ClientLoanDto> Credits { get; set; }
+        public ICollection<CardDto> Cards { get; set; }
     }
 }

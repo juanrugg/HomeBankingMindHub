@@ -65,12 +65,23 @@ namespace HomeBankingMindHub.Controllers
                             CreationDate = ac.CreationDate,
                             Number = ac.Number
                         }).ToList(),
-                        Loans = client.ClientLoans.Select(cl => new ClientLoanDto { 
+                        Credits = client.ClientLoans.Select(cl => new ClientLoanDto {
                             Id = cl.Id,
                             LoanId = cl.LoanId,
                             Name = cl.Loan.Name,
                             Amount = cl.Amount,
                             Payments = int.Parse(cl.Payments)
+                        }).ToList(),
+                        Cards = client.Cards.Select(card => new CardDto
+                        {
+                            Id = card.Id,
+                            CardHolder = card.CardHolder,
+                            Color = card.Color,
+                            Type = card.Type,
+                            Number = card.Number,
+                            Cvv = card.Cvv,
+                            FromDate = card.FromDate,
+                            ThruDate = card.ThruDate
                         }).ToList()
                     };
 
@@ -111,13 +122,24 @@ namespace HomeBankingMindHub.Controllers
                         CreationDate = ac.CreationDate,
                         Number = ac.Number
                     }).ToList(),
-                    Loans = client.ClientLoans.Select(cl => new ClientLoanDto
+                    Credits = client.ClientLoans.Select(cl => new ClientLoanDto
                     {
                         Id = cl.Id,
                         LoanId = cl.LoanId,
                         Name = cl.Loan.Name,
                         Amount = cl.Amount,
                         Payments = int.Parse(cl.Payments)
+                    }).ToList(),
+                    Cards = client.Cards.Select(card => new CardDto
+                    {
+                        Id = card.Id,
+                        CardHolder = card.CardHolder,
+                        Color = card.Color,
+                        Type = card.Type,
+                        Number = card.Number,
+                        Cvv = card.Cvv,
+                        FromDate = card.FromDate,
+                        ThruDate = card.ThruDate
                     }).ToList()
                 };
                 return Ok(clientDTO);
