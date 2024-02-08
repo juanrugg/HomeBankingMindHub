@@ -11,7 +11,8 @@ namespace HomeBankingMindHub.Dto
         public double Amount { get; set; }
         public string Description { get; set; }
         public DateTime Date { get; set; }
-        
+        public string AccountId { get; set; }
+
 
 
     }
