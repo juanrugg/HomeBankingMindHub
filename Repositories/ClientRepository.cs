@@ -7,6 +7,16 @@ namespace HomeBankingMindHub.Repositories
     {
         public ClientRepository(HomeBankingContext repositoryContext) : base(repositoryContext) { }
 
+        public Client FindByEmail(string email)
+        {
+            return FindByCondition(client => client.Email.ToLower() == email.ToLower())
+                .Include(client => client.Accounts)
+                .Include(client => client.ClientLoans)
+                .ThenInclude(cl => cl.Loan)
+                .Include(client => client.Cards)
+                .FirstOrDefault();
+        }
+
         public Client FindById(long id)
         {
             return FindByCondition(Client => Client.Id == id)
