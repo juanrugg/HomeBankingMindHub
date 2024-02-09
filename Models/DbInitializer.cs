@@ -20,7 +20,7 @@
             }
             if (!context.Accounts.Any())
             {
-                var accountSalva = context.Clients.FirstOrDefault(c => c.Email == "test1@123.com");
+                var accountSalva = context.Clients.FirstOrDefault(c => c.Email == "vcoronado@gmail.com");
 
                 if (accountSalva != null)
                 {
@@ -42,10 +42,10 @@
                 {
                     var transactions = new Transaction[]
                     {
-                        new Transaction { AccountId= account1.Id, Amount = 10000, Date= DateTime.Now.AddHours(-5), Description = "Transferencia recibida", Type = TransactionType.CREDIT.ToString() },
-                        new Transaction { AccountId= account1.Id, Amount = -2000, Date= DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre", Type = TransactionType.DEBIT.ToString() },
-                        new Transaction { AccountId= account1.Id, Amount = -3000, Date= DateTime.Now.AddHours(-7), Description = "Compra en CompraGamer", Type = TransactionType.DEBIT.ToString() },
-                        new Transaction { AccountId= account1.Id, Amount = 20000, Date= DateTime.Now.AddHours(-8), Description = "Premio Telekino", Type = TransactionType.CREDIT.ToString() }
+                        new Transaction { AccountId= account1.Id, Amount = 10000, Date= DateTime.Now.AddHours(-5), Description = "Transferencia recibida", Type = TransactionType.CREDIT },
+                        new Transaction { AccountId= account1.Id, Amount = -2000, Date= DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre", Type = TransactionType.DEBIT },
+                        new Transaction { AccountId= account1.Id, Amount = -3000, Date= DateTime.Now.AddHours(-7), Description = "Compra en CompraGamer", Type = TransactionType.DEBIT },
+                        new Transaction { AccountId= account1.Id, Amount = 20000, Date= DateTime.Now.AddHours(-8), Description = "Premio Telekino", Type = TransactionType.CREDIT }
 
                     };
                     foreach (Transaction transaction in transactions)
@@ -135,8 +135,8 @@
                         {
                             ClientId = client1.Id,
                             CardHolder = client1.FirstName + " " + client1.LastName,
-                            Type = CardType.DEBIT.ToString(),
-                            Color = CardColor.GOLD.ToString(),
+                            Type = CardType.DEBIT,
+                            Color = CardColor.GOLD,
                             Number = "3325-6745-7876-4445",
                             Cvv = 990,
                             FromDate = DateTime.Now,
@@ -146,8 +146,8 @@
                         {
                             ClientId= client1.Id,
                             CardHolder = client1.FirstName + " " + client1.LastName,
-                            Type = CardType.CREDIT.ToString(),
-                            Color = CardColor.TITANIUM.ToString(),
+                            Type = CardType.CREDIT,
+                            Color = CardColor.TITANIUM,
                             Number = "2234-6745-552-7888",
                             Cvv = 750,
                             FromDate = DateTime.Now,
