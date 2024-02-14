@@ -17,7 +17,7 @@ namespace HomeBankingMindHub.Controllers
         }
 
 
-
+      
 
         [HttpGet]
         public IActionResult Get()

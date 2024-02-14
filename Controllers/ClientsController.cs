@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using HomeBankingMindHub.Services.Interfaces;
 
 
 namespace HomeBankingMindHub.Controllers
@@ -23,11 +24,13 @@ namespace HomeBankingMindHub.Controllers
 
     {
 
-        private IClientRepository _clientRepository;        
+        private IClientRepository _clientRepository;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientRepository clientRepository, IPasswordHasher passwordHasher)
         {
-            _clientRepository = clientRepository;            
+            _clientRepository = clientRepository;   
+            _passwordHasher = passwordHasher;
         }
 
         [HttpGet]
@@ -227,16 +230,17 @@ namespace HomeBankingMindHub.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Client client)
+        public IActionResult Post([FromBody] NewClientDto newClientDto)
         {
             try {
 
-                if (string.IsNullOrEmpty(client.Email) || string.IsNullOrEmpty(client.Password)
-                    || string.IsNullOrEmpty(client.FirstName) || string.IsNullOrEmpty(client.LastName))
+                var passwordHash = _passwordHasher.Hash(newClientDto.Password);
+                if (string.IsNullOrEmpty(newClientDto.Email) || string.IsNullOrEmpty(newClientDto.Password)
+                    || string.IsNullOrEmpty(newClientDto.FirstName) || string.IsNullOrEmpty(newClientDto.LastName))
 
                     return StatusCode(403, "Datos Invalidos");
 
-                Client user = _clientRepository.FindByEmail(client.Email);
+                Client user = _clientRepository.FindByEmail(newClientDto.Email);
 
                 if(user != null)
                 {
@@ -245,10 +249,10 @@ namespace HomeBankingMindHub.Controllers
                  
                 Client newClient = new Client()
                 {
-                    Email = client.Email,
-                    Password = client.Password,
-                    FirstName = client.FirstName,
-                    LastName = client.LastName,
+                    Email = newClientDto.Email,
+                    HashedPassword = passwordHash,
+                    FirstName = newClientDto.FirstName,
+                    LastName = newClientDto.LastName,
                 };
 
                 _clientRepository.Save(newClient);
@@ -259,6 +263,20 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500,ex.Message);
             }
         }
+
+        //[HttpPost("current/accounts")]
+        //public ActionResult PostNewAccount()
+        //{
+        //    try
+        //    {
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
 
 
     }

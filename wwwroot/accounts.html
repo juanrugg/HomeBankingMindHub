@@ -46,7 +46,7 @@
                         </ul>
                         <hr>
                         <ul class="nav nav-pills flex-column mb-auto">
-                            <button class="btn btn-danger img-fluid" v-on:click="signOut()">Sign out</button>
+                            <button class="btn btn-danger img-fluid" v-on:click="signOut">Sign out</button>
                         </ul>                        
                     </div>
                 </div>
@@ -60,11 +60,12 @@
                     <div class="row mt-3">
                         <div class="col">
                             <h2 class="display-6">Accounts</h2>
+                            <button v-if="clientInfo.accounts != null && clientInfo.accounts.length < 3" v-on:click="create" id="create" class="btn btn-sm btn-outline-success">Create</button>
                         </div>
                     </div>
                     <div class="row">
                         <div v-for="account in clientInfo.accounts" class="col-12 col-md-3 mt-2">
-                            <a class="account-link" v-bind:href="'../account.html?id='+account.id">
+                            <a class="account-link" v-bind:href="'http://localhost:5220/account.html?id='+account.id">
                                 <div class="card border-0 account">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ account.number }}</h5>

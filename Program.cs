@@ -1,5 +1,7 @@
 using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Services;
+using HomeBankingMindHub.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

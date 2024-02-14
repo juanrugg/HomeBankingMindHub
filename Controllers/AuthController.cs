@@ -1,5 +1,7 @@
-﻿using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Dto;
+using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -13,22 +15,30 @@ namespace HomeBankingMindHub.Controllers
     public class AuthController : ControllerBase
     {
         private IClientRepository _clientRepository;
-        public AuthController(IClientRepository clientRepository)
+        private IPasswordHasher _passwordHasher;
+        public AuthController(IClientRepository clientRepository, IPasswordHasher passwordHasher)
         {
             _clientRepository = clientRepository;
+            _passwordHasher = passwordHasher;
         }
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Client client)
+        public async Task<IActionResult> Login([FromBody] NewClientDto NewClientDto)
         {
             try
             {
-                Client user = _clientRepository.FindByEmail(client.Email);
+                Client user = _clientRepository.FindByEmail(NewClientDto.Email);
+
+                var result = _passwordHasher.VerifyPassword(user.HashedPassword, NewClientDto.Password);
+                if (result == false)
+                {
+                    throw new Exception("Username is not correct");
+                }
                 
-                if (user == null || !String.Equals(user.Password, client.Password))
+                //if (user == null || !String.Equals(user.HashedPassword, client.HashedPassword))
                 
-                    return Unauthorized();
+                //    return Unauthorized();
 
                 var claims = new List<Claim>
                 {

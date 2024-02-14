@@ -21,5 +21,6 @@ namespace HomeBankingMindHub.Repositories
             return FindAll()
                .Include(Account => Account.Transactions).ToList();
         }
+
     }
 }
