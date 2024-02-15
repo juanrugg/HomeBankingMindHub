@@ -13,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 //builder.Services.AddControllers().AddJsonOptions(x=>
 //x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 

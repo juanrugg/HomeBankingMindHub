@@ -1,7 +1,4 @@
-﻿
-using HomeBankingMindHub.Dto;
-using HomeBankingMindHub.Models.Model;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
 using HomeBankingMindHub.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.Security.Claims;
+using HomeBankingMindHub.Utils;
+using HomeBankingMindHub.Models.Dto;
 
 
 namespace HomeBankingMindHub.Controllers
@@ -25,12 +26,14 @@ namespace HomeBankingMindHub.Controllers
     {
 
         private IClientRepository _clientRepository;
+        private IAccountRepository _accountRepository;
         private readonly IPasswordHasher _passwordHasher;
 
-        public ClientsController(IClientRepository clientRepository, IPasswordHasher passwordHasher)
+        public ClientsController(IClientRepository clientRepository, IPasswordHasher passwordHasher,IAccountRepository accountRepository)
         {
             _clientRepository = clientRepository;   
             _passwordHasher = passwordHasher;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -256,9 +259,26 @@ namespace HomeBankingMindHub.Controllers
                 };
 
                 _clientRepository.Save(newClient);
-                return Created("",newClient);
+                
+                Client client = _clientRepository.FindByEmail(newClient.Email);
 
-            }catch (Exception ex)
+                Account newAccount = new Account()
+                {
+                    Number = Utils.Utils.GenerateAccountNumber(),
+                    CreationDate = DateTime.Now,
+                    Balance = 0,
+                    ClientId = client.Id
+                    //Client = client
+
+                };
+                _accountRepository.Save(newAccount);
+
+                return StatusCode (201, newClient);
+
+               
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500,ex.Message);
             }
@@ -278,6 +298,32 @@ namespace HomeBankingMindHub.Controllers
         //    }
         //}
 
+        //[HttpPost("current/cards")]
+        //public ActionResult PostNewCard([FromBody],long Id)
+        //{
+        //    Client client = _clientRepository.FindById(Id);
+            
+        //    try
+        //    {
+        //        Card newCard = new Card()
+        //        {
+        //            CardHolder = client.FirstName,
+        //            Number = Utils.Utils.GenerateCardNumber(),
+        //            FromDate = DateTime.Now.AddMonths(0),
+        //            ThruDate = DateTime.Now.AddYears(4),
+
+
+        //        };
+        //        client.Cards.Add(newCard);
+                
+
+        //    }
+        //    catch (Exception ex) 
+        //    {
+        //        return StatusCode(500,ex.Message);
+        //    }
+
+        //}
 
     }
 

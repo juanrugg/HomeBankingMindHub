@@ -1,5 +1,5 @@
-﻿using HomeBankingMindHub.Dto;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.Dto;
 using HomeBankingMindHub.Repositories;
 using HomeBankingMindHub.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
