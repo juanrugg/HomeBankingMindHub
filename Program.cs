@@ -23,16 +23,8 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ICardRepository, CardRepository>();
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("Nuevapolitica", app =>
-//    {
-//        app.AllowAnyOrigin()
-//        .AllowAnyMethod()
-//        .AllowAnyHeader();
-//    });
-//});
-//builder.Services.AddSignalR();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
