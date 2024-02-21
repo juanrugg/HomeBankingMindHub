@@ -340,20 +340,26 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return Unauthorized();
                 }
-
                 Client client = _clientRepository.FindByEmail(clientEmail);
+                bool canCreateAccount = _accountRepository.HasAccountsAvailable(clientEmail);
+                if (canCreateAccount) {
+                    Account newAccount = new Account()
+                    {
+                        Number = Utils.Utils.GenerateAccountNumber(),
+                        CreationDate = DateTime.Now,
+                        Balance = 0,
+                        ClientId = client.Id
+                        //Client = client
 
-                Account newAccount = new Account()
+                    };
+                    _accountRepository.Save(newAccount);
+                    return StatusCode(201);
+                }
+                else
                 {
-                    Number = Utils.Utils.GenerateAccountNumber(),
-                    CreationDate = DateTime.Now,
-                    Balance = 0,
-                    ClientId = client.Id
-                    //Client = client
-
-                };
-                _accountRepository.Save(newAccount);
-                return StatusCode(201);
+                    return StatusCode(403, "Ya se alcanzo el maximo de cuentas posibles");
+                }
+            
 
             }
             catch (Exception ex)
