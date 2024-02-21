@@ -17,9 +17,9 @@ namespace HomeBankingMindHub.Repositories
         }
 
 
-        public IEnumerable<Account> GetAccountsByClient(long clientId)
+        public IEnumerable<Account> GetAccountsByClient(string Email)
         {
-            return FindByCondition(account => account.ClientId == clientId)
+            return FindByCondition(x => x.Client.Email == Email)
                 .Include(account => account.Transactions)
                 .ToList();
         }
