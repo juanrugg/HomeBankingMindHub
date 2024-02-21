@@ -1,5 +1,5 @@
-﻿using HomeBankingMindHub.Dto;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.Dto;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +17,7 @@ namespace HomeBankingMindHub.Controllers
         }
 
 
-
+      
 
         [HttpGet]
         public IActionResult Get()

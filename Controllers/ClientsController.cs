@@ -1,7 +1,4 @@
-﻿
-using HomeBankingMindHub.Dto;
-using HomeBankingMindHub.Models.Model;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using HomeBankingMindHub.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.Security.Claims;
+using HomeBankingMindHub.Utils;
+using HomeBankingMindHub.Models.Dto;
+using System.Net;
+using System.Drawing;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace HomeBankingMindHub.Controllers
@@ -23,11 +28,16 @@ namespace HomeBankingMindHub.Controllers
 
     {
 
-        private IClientRepository _clientRepository;        
-
-        public ClientsController(IClientRepository clientRepository)
+        private IClientRepository _clientRepository;
+        private IAccountRepository _accountRepository;
+        private readonly IPasswordHasher _passwordHasher;
+        private ICardRepository _cardRepository;
+        public ClientsController(IClientRepository clientRepository, IPasswordHasher passwordHasher,IAccountRepository accountRepository, ICardRepository cardRepository)
         {
-            _clientRepository = clientRepository;            
+            _clientRepository = clientRepository;   
+            _passwordHasher = passwordHasher;
+            _accountRepository = accountRepository;
+            _cardRepository = cardRepository;
         }
 
         [HttpGet]
@@ -227,16 +237,17 @@ namespace HomeBankingMindHub.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Client client)
+        public IActionResult Post([FromBody] NewClientDto newClientDto)
         {
             try {
 
-                if (string.IsNullOrEmpty(client.Email) || string.IsNullOrEmpty(client.Password)
-                    || string.IsNullOrEmpty(client.FirstName) || string.IsNullOrEmpty(client.LastName))
+                var passwordHash = _passwordHasher.Hash(newClientDto.Password);
+                if (string.IsNullOrEmpty(newClientDto.Email) || string.IsNullOrEmpty(newClientDto.Password)
+                    || string.IsNullOrEmpty(newClientDto.FirstName) || string.IsNullOrEmpty(newClientDto.LastName))
 
                     return StatusCode(403, "Datos Invalidos");
 
-                Client user = _clientRepository.FindByEmail(client.Email);
+                Client user = _clientRepository.FindByEmail(newClientDto.Email);
 
                 if(user != null)
                 {
@@ -245,21 +256,198 @@ namespace HomeBankingMindHub.Controllers
                  
                 Client newClient = new Client()
                 {
-                    Email = client.Email,
-                    Password = client.Password,
-                    FirstName = client.FirstName,
-                    LastName = client.LastName,
+                    Email = newClientDto.Email,
+                    HashedPassword = passwordHash,
+                    FirstName = newClientDto.FirstName,
+                    LastName = newClientDto.LastName,
                 };
 
                 _clientRepository.Save(newClient);
-                return Created("",newClient);
+                
+                Client client = _clientRepository.FindByEmail(newClient.Email);
 
-            }catch (Exception ex)
+                Account newAccount = new Account()
+                {
+                    Number = Utils.Utils.GenerateAccountNumber(),
+                    CreationDate = DateTime.Now,
+                    Balance = 0,
+                    ClientId = client.Id
+                    //Client = client
+
+                };
+                _accountRepository.Save(newAccount);
+
+                return StatusCode (201, newClient);
+
+               
+
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500,ex.Message);
             }
         }
 
+        [HttpGet("current/accounts")]
+        public IActionResult getCurrentAccounts()
+        {
+            try
+            {
+                string clientEmail = User.FindFirstValue("Client");
+
+                Account[] accounts = _accountRepository.GetAccountsByClient(clientEmail).ToArray();
+                AccountDto[] accountDto = new AccountDto[accounts.Count()];
+                int index = 0;
+                foreach(Account account1 in accounts) 
+                {
+
+                    accountDto[index] = new() 
+                    {
+                        Id = account1.Id,
+                        Balance = account1.Balance,
+                        CreationDate = account1.CreationDate,
+                        Number = account1.Number,
+                        Transactions = account1.Transactions.Select(transaction => new TransactionDto
+                        {
+                            Type = transaction.Type.ToString(),
+                            Amount = transaction.Amount,
+                            Description = transaction.Description,
+                            Date = transaction.Date,
+                            Id = transaction.Id
+                        }).ToList()
+                    };
+
+                    index++;
+                }   
+
+
+                return Ok(accountDto);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("current/accounts")]
+        public ActionResult PostNewAccount()
+        {
+            try
+            {
+                string? clientEmail = User.FindFirstValue("Client");
+                if (clientEmail.IsNullOrEmpty())
+                {
+                    return Unauthorized();
+                }
+
+                Client client = _clientRepository.FindByEmail(clientEmail);
+
+                Account newAccount = new Account()
+                {
+                    Number = Utils.Utils.GenerateAccountNumber(),
+                    CreationDate = DateTime.Now,
+                    Balance = 0,
+                    ClientId = client.Id
+                    //Client = client
+
+                };
+                _accountRepository.Save(newAccount);
+                return StatusCode(201);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("current/cards")]
+        public IActionResult getCurrentCards()
+        {
+            try { 
+            string clientEmail = User.FindFirstValue("Client");
+
+            var cards = _cardRepository.GetAllCardsFrom(clientEmail);
+                if (clientEmail.IsNullOrEmpty())
+                {
+                    return Forbid();
+                }
+                var cardsDto = new List<CardDto>();
+            foreach (Card card in cards)
+            {
+                var newCardDto = new CardDto
+                {
+                    Id = card.Id,
+                    CardHolder = card.CardHolder,
+                    Number = card.Number,
+                    Color = card.Color.ToString(),
+                    Type = card.Type.ToString(),
+                    Cvv = card.Cvv,
+                    FromDate = card.FromDate,
+                    ThruDate = card.ThruDate,
+
+                };
+                cardsDto.Add(newCardDto);
+            }
+
+                return Ok(cardsDto);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        [HttpPost("current/cards")]
+        public ActionResult PostNewCard([FromBody] NewCardDto model)
+        {
+
+            try
+            {
+                string? clientEmail = User.FindFirstValue("Client");
+
+                if (clientEmail.IsNullOrEmpty())
+                {
+                    return Unauthorized();
+                }
+
+                Client client = _clientRepository.FindByEmail(clientEmail);
+                Random random = new Random();
+
+             
+                CardType Type = (CardType)Enum.Parse(typeof(CardType), model.Type, true);
+                CardColor Color = (CardColor)Enum.Parse(typeof(CardColor), model.Color, true);
+
+
+                Card newCard = new Card()
+                {
+                    CardHolder = client.FirstName,
+                    Number = Utils.Utils.GenerateCardNumber(),
+                    FromDate = DateTime.Now.AddMonths(0),
+                    ThruDate = DateTime.Now.AddYears(4),                    
+                    Type = (CardType)Enum.Parse(typeof(CardType), model.Type, true),
+                    Color = (CardColor)Enum.Parse(typeof(CardColor), model.Color, true),
+                    Cvv = random.Next(100,1000),
+                    ClientId = client.Id
+                };
+
+                if (_cardRepository.ValidateCard(client.Id, Type, Color) == true)
+                {
+                    return StatusCode(403,"El cliente ya cuenta con una tarjeta de este tipo y color");
+                }
+
+                _cardRepository.save(newCard);
+
+                return StatusCode(201);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
 
     }
 
